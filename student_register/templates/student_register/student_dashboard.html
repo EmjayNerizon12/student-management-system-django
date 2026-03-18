@@ -1,0 +1,79 @@
+{% extends "student_register/base.html" %}
+
+{% block title %}Student Dashboard{% endblock title %}
+
+{% block content %}
+<div class="dashboard-shell">
+    <div class="dashboard-hero">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+            <div>
+                <h1 class="dashboard-title">Student Dashboard</h1>
+                <p class="dashboard-subtitle">
+                    See your academic overview, contact details, and student profile in one clear place.
+                </p>
+            </div>
+            <a href="{% url 'profile' %}" class="btn btn-primary">Update Profile</a>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Student Number</div>
+            <div class="stat-value">{{ request.user.student_no|default:"-" }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Degree</div>
+            <div class="stat-value">{{ request.user.degree|default:"-" }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Year / Section</div>
+            <div class="stat-value">
+                {{ student.year_level|default:"-" }}{% if student.section %} - {{ student.section }}{% endif %}
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Peers in Degree</div>
+            <div class="stat-value">{{ degree_peers }}</div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="section-card h-100">
+                <div class="section-card-header">
+                    <h2 class="h4 mb-1">Personal Information</h2>
+                    <p class="text-muted-app mb-0">Basic identity and contact details.</p>
+                </div>
+                <div class="section-card-body">
+                    <div class="info-tile soft-primary">
+                        <h3>Contact</h3>
+                        <div class="mb-2"><strong>Full Name:</strong> {{ student.full_name }}</div>
+                        <div class="mb-2"><strong>Email:</strong> {{ student.email }}</div>
+                        <div class="mb-2"><strong>Phone:</strong> {{ student.phone_number|default:"Not set" }}</div>
+                        <div class="mb-2"><strong>Date of Birth:</strong> {{ student.date_of_birth|default:"Not set" }}</div>
+                        <div><strong>Address:</strong> {{ student.full_address|default:"Not set" }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="section-card h-100">
+                <div class="section-card-header">
+                    <h2 class="h4 mb-1">Academic Information</h2>
+                    <p class="text-muted-app mb-0">Enrollment and support contacts.</p>
+                </div>
+                <div class="section-card-body">
+                    <div class="info-tile soft-accent">
+                        <h3>School Record</h3>
+                        <div class="mb-2"><strong>Academic Year:</strong> {{ student.academic_year|default:"Not set" }}</div>
+                        <div class="mb-2"><strong>Enrollment Status:</strong> {{ student.get_enrollment_status_display|default:"Not set" }}</div>
+                        <div class="mb-2"><strong>Admission Date:</strong> {{ student.admission_date|default:"Not set" }}</div>
+                        <div class="mb-2"><strong>Guardian:</strong> {{ student.guardian_name|default:"Not set" }}</div>
+                        <div><strong>Emergency Contact:</strong> {{ student.emergency_contact_name|default:"Not set" }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

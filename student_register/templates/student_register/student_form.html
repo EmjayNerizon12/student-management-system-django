@@ -1,0 +1,47 @@
+{% extends "student_register/base.html" %}
+
+{% block title %}{{ page_title }}{% endblock title %}
+
+{% block content %}
+<div class="card border-0">
+    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+            <h1 class="mb-1 fs-3">{{ page_title }}</h1>
+            <p class="mb-0 text-white-50">Manage account credentials, personal details, academic information, and guardian contacts.</p>
+        </div>
+        <a href="{% url 'student_list' %}" class="btn btn-accent">Back to List</a>
+    </div>
+    <div class="card-body">
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="row g-3">
+                {% for field in form %}
+                <div class="{% if field.name == 'is_active' %}col-12{% else %}col-md-6{% endif %}">
+                    <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}
+                    <div class="small text-muted-app mt-2">{{ field.help_text }}</div>
+                    {% endif %}
+                    {% for error in field.errors %}
+                    <div class="text-warning small mt-2">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            </div>
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger mt-4">
+                {% for error in form.non_field_errors %}
+                <div>{{ error }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="mt-4 d-flex gap-3 flex-wrap">
+                <button type="submit" class="btn btn-primary">{{ submit_label }}</button>
+                <a href="{% url 'student_list' %}" class="btn btn-accent">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock content %}

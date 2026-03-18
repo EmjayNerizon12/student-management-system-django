@@ -1,0 +1,69 @@
+{% extends "student_register/base.html" %}
+
+{% block title %}Degrees{% endblock title %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="card border-0">
+            <div class="card-header">
+                <h1 class="mb-0 fs-4">Add Degree</h1>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <div class="mb-3">
+                        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% for error in field.errors %}
+                        <div class="text-warning small mt-2">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+                    <button type="submit" class="btn btn-primary w-100">Save Degree</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="card border-0">
+            <div class="card-header">
+                <h2 class="mb-0 fs-4">Degree List</h2>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-dark align-middle">
+                        <thead>
+                            <tr>
+                                <th>Degree</th>
+                                <th>Students</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for degree in degrees %}
+                            <tr>
+                                <td>{{ degree.degree_title }}</td>
+                                <td>{{ degree.students.count }}</td>
+                                <td class="text-end">
+                                    <a href="{% url 'degree_edit' degree.pk %}" class="btn btn-sm btn-primary">Edit</a>
+                                    <form method="post" action="{% url 'degree_delete' degree.pk %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-accent">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center">No degrees found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

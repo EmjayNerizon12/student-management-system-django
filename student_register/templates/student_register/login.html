@@ -1,0 +1,164 @@
+{% extends "student_register/base.html" %}
+
+{% block title %}Login{% endblock title %}
+
+{% block header %}{% endblock header %}
+
+{% block extra_head %}
+<style>
+    .login-shell {
+        min-height: 82vh;
+        display: grid;
+        align-items: center;
+    }
+
+    .login-layout {
+        display: grid;
+        grid-template-columns: 1.08fr 0.92fr;
+        gap: 1.5rem;
+        align-items: stretch;
+    }
+
+    .login-form-card {
+        border-radius: 1.5rem;
+        border: 1px solid var(--app-border);
+        background: rgba(255, 255, 255, 0.98);
+        box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
+        padding: 2rem;
+    }
+
+    .showcase-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.45rem 0.8rem;
+        border-radius: 999px;
+        background: #fff4da;
+        color: #9a6500;
+        font-size: 0.84rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .login-form-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 0.35rem;
+    }
+
+    .login-form-subtitle {
+        color: var(--app-muted);
+        margin-bottom: 1.5rem;
+    }
+
+    .field-shell {
+        margin-bottom: 1rem;
+    }
+
+    .field-shell .form-label {
+        font-size: 0.92rem;
+        margin-bottom: 0.45rem;
+    }
+
+    .field-shell .form-control {
+        min-height: 3.3rem;
+        padding-inline: 1rem;
+        border-radius: 1rem;
+        background: #fbfcfe;
+    }
+
+    .field-shell .form-control::placeholder {
+        color: #98a3b6;
+    }
+
+    .login-submit {
+        min-height: 3.35rem;
+        border-radius: 1rem;
+        font-size: 1rem;
+        letter-spacing: 0.01em;
+    }
+
+    .login-help {
+        margin-top: 1rem;
+        color: var(--app-muted);
+        font-size: 0.92rem;
+        text-align: center;
+    }
+
+    @media (max-width: 991.98px) {
+        .login-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock extra_head %}
+
+{% block content %}
+<div class="login-shell">
+    <div class="login-layout">
+        <section class="hero-panel card border-0">
+            <div class="card-body p-0">
+                <span class="showcase-badge">
+                    <i class="fa-brands fa-python"></i>
+                    Secure School Access
+                </span>
+                <h1 class="display-5 fw-bold mb-3">Login to Student Project</h1>
+                <p class="text-muted-app mb-4">
+                    Admins can manage student accounts and degree programs. Students can sign in to view their dashboard and profile.
+                </p>
+                <div class="d-flex flex-wrap gap-3">
+                    <div class="px-3 py-2 rounded-3 border" style="background: #eef4ff; border-color: #cfe0ff !important; color: #2454b8;">
+                        <i class="fa-solid fa-user-shield me-2"></i>Admin Access
+                    </div>
+                    <div class="px-3 py-2 rounded-3 border" style="background: #fff6e8; border-color: #f6ddaf !important; color: #b96a00;">
+                        <i class="fa-solid fa-user-graduate me-2"></i>Student Access
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="login-form-card">
+            <div class="mb-4">
+                <h2 class="login-form-title">Welcome back</h2>
+                <p class="login-form-subtitle">Enter your account credentials to continue.</p>
+            </div>
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {% for error in form.non_field_errors %}
+                    <div>{{ error }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <div class="field-shell">
+                    <label class="form-label" for="{{ form.username.id_for_label }}">Username</label>
+                    {{ form.username }}
+                    {% for error in form.username.errors %}
+                    <div class="text-warning small mt-2">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="field-shell">
+                    <label class="form-label" for="{{ form.password.id_for_label }}">Password</label>
+                    {{ form.password }}
+                    {% for error in form.password.errors %}
+                    <div class="text-warning small mt-2">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 login-submit">
+                    <i class="fa-solid fa-right-to-bracket me-2"></i>Log In
+                </button>
+
+                <div class="login-help">
+                    Use the credentials assigned to your admin or student account.
+                </div>
+            </form>
+        </section>
+    </div>
+</div>
+{% endblock content %}

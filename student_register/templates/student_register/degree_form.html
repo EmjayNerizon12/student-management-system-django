@@ -1,0 +1,26 @@
+{% extends "student_register/base.html" %}
+
+{% block title %}{{ page_title }}{% endblock title %}
+
+{% block content %}
+<div class="card border-0">
+    <div class="card-header">
+        <h1 class="mb-0 fs-3">{{ page_title }}</h1>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="mb-3">
+                <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% for error in field.errors %}
+                <div class="text-warning small mt-2">{{ error }}</div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary">{{ submit_label }}</button>
+        </form>
+    </div>
+</div>
+{% endblock content %}

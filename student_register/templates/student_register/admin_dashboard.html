@@ -1,0 +1,87 @@
+{% extends "student_register/base.html" %}
+
+{% block title %}Admin Dashboard{% endblock title %}
+
+{% block content %}
+<div class="dashboard-shell">
+    <div class="dashboard-hero">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+            <div>
+                <h1 class="dashboard-title">Admin Dashboard</h1>
+                <p class="dashboard-subtitle">
+                    Review student activity, manage records, and keep academic data organized from one simple workspace.
+                </p>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="{% url 'student_list' %}" class="btn btn-primary">Manage Students</a>
+                <a href="{% url 'degree_list' %}" class="btn btn-accent">Manage Degrees</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Total Students</div>
+            <div class="stat-value">{{ total_students }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Active Students</div>
+            <div class="stat-value">{{ active_students }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Degree Programs</div>
+            <div class="stat-value">{{ degree_count }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Graduated Students</div>
+            <div class="stat-value">{{ graduated_students }}</div>
+        </div>
+    </div>
+
+    <div class="section-card">
+        <div class="section-card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <h2 class="h4 mb-1">Recent Student Accounts</h2>
+                <p class="text-muted-app mb-0">A quick look at the most recently created student records.</p>
+            </div>
+            <a href="{% url 'student_list' %}" class="btn btn-outline-light">View all</a>
+        </div>
+        <div class="section-card-body">
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Username</th>
+                            <th>Degree</th>
+                            <th>Year Level</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in recent_students %}
+                        <tr>
+                            <td>{{ student.full_name }}</td>
+                            <td>{{ student.username }}</td>
+                            <td>{{ student.degree|default:"Not assigned" }}</td>
+                            <td>{{ student.year_level|default:"Not set" }}</td>
+                            <td>
+                                {% if student.is_active %}
+                                <span class="badge text-bg-success">Active</span>
+                                {% else %}
+                                <span class="badge text-bg-secondary">Inactive</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center">No student accounts yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,43 @@
+{% extends "student_register/base.html" %}
+
+{% block title %}Profile{% endblock title %}
+
+{% block content %}
+<div class="card border-0">
+    <div class="card-header">
+        <h1 class="mb-0 fs-3">My Profile</h1>
+    </div>
+    <div class="card-body">
+        <form method="post" class="row g-3">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="col-md-6">
+                <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% for error in field.errors %}
+                <div class="text-warning small mt-2">{{ error }}</div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">Save Profile</button>
+            </div>
+        </form>
+        <hr class="my-4">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="small text-muted-app">Student Number</div>
+                <div class="fw-bold">{{ request.user.student_no|default:"Not assigned" }}</div>
+            </div>
+            <div class="col-md-4">
+                <div class="small text-muted-app">Degree</div>
+                <div class="fw-bold">{{ request.user.degree|default:"Not assigned" }}</div>
+            </div>
+            <div class="col-md-4">
+                <div class="small text-muted-app">Enrollment Status</div>
+                <div class="fw-bold">{{ request.user.get_enrollment_status_display }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
