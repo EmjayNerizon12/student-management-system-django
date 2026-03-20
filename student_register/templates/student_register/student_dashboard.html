@@ -5,25 +5,31 @@
 {% block content %}
 <div class="dashboard-shell">
     <div class="dashboard-hero">
-        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
-            <div>
+        <div class="dashboard-hero-layout">
+            <div class="dashboard-hero-copy">
+                <div class="dashboard-kicker">Student Workspace</div>
                 <h1 class="dashboard-title">Student Dashboard</h1>
                 <p class="dashboard-subtitle">
-                    See your academic overview, contact details, and student profile in one clear place.
+                    Review your academic profile, contact details, and support information from one simple workspace.
                 </p>
             </div>
-            <a href="{% url 'profile' %}" class="btn btn-primary">Update Profile</a>
+            <div class="dashboard-hero-panel">
+                <div class="dashboard-hero-label">Profile Access</div>
+                <div class="dashboard-hero-name">{{ student.full_name }}</div>
+                <p class="dashboard-hero-note mb-0">Keep your student record current so your academic and contact details stay accurate.</p>
+                <a href="{% url 'profile' %}" class="btn btn-primary">Update Profile</a>
+            </div>
         </div>
     </div>
 
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-label">Student Number</div>
-            <div class="stat-value">{{ request.user.student_no|default:"-" }}</div>
+            <div class="stat-value">{{ student.student_no|default:"-" }}</div>
         </div>
         <div class="stat-card">
-            <div class="stat-label">Degree</div>
-            <div class="stat-value">{{ request.user.degree|default:"-" }}</div>
+            <div class="stat-label">Enrollment Status</div>
+            <div class="stat-value">{{ student.get_enrollment_status_display }}</div>
         </div>
         <div class="stat-card">
             <div class="stat-label">Year / Section</div>
@@ -41,37 +47,104 @@
         <div class="col-lg-6">
             <div class="section-card h-100">
                 <div class="section-card-header">
-                    <h2 class="h4 mb-1">Personal Information</h2>
-                    <p class="text-muted-app mb-0">Basic identity and contact details.</p>
+                    <h2 class="h4 mb-1">Academic Summary</h2>
+                    <p class="text-muted-app mb-0">Your current academic record and enrollment details.</p>
                 </div>
                 <div class="section-card-body">
-                    <div class="info-tile soft-primary">
-                        <h3>Contact</h3>
-                        <div class="mb-2"><strong>Full Name:</strong> {{ student.full_name }}</div>
-                        <div class="mb-2"><strong>Email:</strong> {{ student.email }}</div>
-                        <div class="mb-2"><strong>Phone:</strong> {{ student.phone_number|default:"Not set" }}</div>
-                        <div class="mb-2"><strong>Date of Birth:</strong> {{ student.date_of_birth|default:"Not set" }}</div>
-                        <div><strong>Address:</strong> {{ student.full_address|default:"Not set" }}</div>
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <tbody>
+                                <tr>
+                                    <th>Degree</th>
+                                    <td>{{ student.degree|default:"Not assigned" }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Academic Year</th>
+                                    <td>{{ student.academic_year|default:"Not set" }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Admission Date</th>
+                                    <td>{{ student.admission_date|default:"Not set" }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Enrollment Status</th>
+                                    <td>{{ student.get_enrollment_status_display }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
+
         <div class="col-lg-6">
             <div class="section-card h-100">
                 <div class="section-card-header">
-                    <h2 class="h4 mb-1">Academic Information</h2>
-                    <p class="text-muted-app mb-0">Enrollment and support contacts.</p>
+                    <h2 class="h4 mb-1">Personal Information</h2>
+                    <p class="text-muted-app mb-0">Basic identity and contact details from your profile.</p>
                 </div>
                 <div class="section-card-body">
-                    <div class="info-tile soft-accent">
-                        <h3>School Record</h3>
-                        <div class="mb-2"><strong>Academic Year:</strong> {{ student.academic_year|default:"Not set" }}</div>
-                        <div class="mb-2"><strong>Enrollment Status:</strong> {{ student.get_enrollment_status_display|default:"Not set" }}</div>
-                        <div class="mb-2"><strong>Admission Date:</strong> {{ student.admission_date|default:"Not set" }}</div>
-                        <div class="mb-2"><strong>Guardian:</strong> {{ student.guardian_name|default:"Not set" }}</div>
-                        <div><strong>Emergency Contact:</strong> {{ student.emergency_contact_name|default:"Not set" }}</div>
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <tbody>
+                                <tr>
+                                    <th>Full Name</th>
+                                    <td>{{ student.full_name }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Email</th>
+                                    <td class="text-break">{{ student.email }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Phone</th>
+                                    <td>{{ student.phone_number|default:"Not set" }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Address</th>
+                                    <td>{{ student.full_address|default:"Not set" }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-card">
+        <div class="section-card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <h2 class="h4 mb-1">Support Contacts</h2>
+                <p class="text-muted-app mb-0">Guardian and emergency contact information saved in your record.</p>
+            </div>
+            <a href="{% url 'profile' %}" class="btn btn-outline-light">Review profile</a>
+        </div>
+        <div class="section-card-body">
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Contact Type</th>
+                            <th>Name</th>
+                            <th>Relationship</th>
+                            <th>Phone</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Guardian</td>
+                            <td>{{ student.guardian_name|default:"Not set" }}</td>
+                            <td>{{ student.guardian_relationship|default:"Not set" }}</td>
+                            <td>{{ student.guardian_phone|default:"Not set" }}</td>
+                        </tr>
+                        <tr>
+                            <td>Emergency</td>
+                            <td>{{ student.emergency_contact_name|default:"Not set" }}</td>
+                            <td>{{ student.emergency_contact_relationship|default:"Not set" }}</td>
+                            <td>{{ student.emergency_contact_phone|default:"Not set" }}</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

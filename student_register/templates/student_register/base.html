@@ -124,6 +124,41 @@
         </div>
     </div>
 
+    {% if messages %}
+    <div class="d-none" id="feedbackMessageStore">
+        {% for message in messages %}
+        <div class="js-feedback-message" data-tags="{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    <div class="modal fade feedback-modal" id="statusFeedbackModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="feedback-sheet">
+                        <div class="feedback-top">
+                            <div class="d-flex gap-3 align-items-start">
+                                <div class="feedback-icon is-success" id="feedbackModalIcon">
+                                    <i class="fa-solid fa-check"></i>
+                                </div>
+                                <div>
+                                    <div class="feedback-kicker" id="feedbackModalKicker">Success</div>
+                                    <h2 class="feedback-title" id="feedbackModalTitle">Action completed</h2>
+                                    <p class="feedback-copy" id="feedbackModalMessage">Your changes have been saved successfully.</p>
+                                </div>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+
+                        <div class="feedback-actions">
+                            <button type="button" class="btn btn-success-soft" data-bs-dismiss="modal" id="feedbackModalClose">Continue</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js" crossorigin="anonymous"
@@ -181,6 +216,49 @@
             modalElement.addEventListener("hidden.bs.modal", () => {
                 activeForm = null;
             });
+        })();
+
+        (() => {
+            const messageStore = document.getElementById("feedbackMessageStore");
+            const modalElement = document.getElementById("statusFeedbackModal");
+            if (!messageStore || !modalElement || !window.bootstrap) {
+                return;
+            }
+
+            const messages = Array.from(messageStore.querySelectorAll(".js-feedback-message"));
+            const activeMessage = messages.find((message) => message.dataset.tags.includes("error"))
+                || messages.find((message) => message.dataset.tags.includes("success"));
+
+            if (!activeMessage) {
+                return;
+            }
+
+            const modal = new bootstrap.Modal(modalElement);
+            const icon = document.getElementById("feedbackModalIcon");
+            const kicker = document.getElementById("feedbackModalKicker");
+            const title = document.getElementById("feedbackModalTitle");
+            const copy = document.getElementById("feedbackModalMessage");
+            const closeButton = document.getElementById("feedbackModalClose");
+            const isError = activeMessage.dataset.tags.includes("error");
+
+            if (isError) {
+                icon.className = "feedback-icon is-error";
+                icon.innerHTML = '<i class="fa-solid fa-circle-xmark"></i>';
+                kicker.textContent = "Error";
+                title.textContent = "Student record not saved";
+                closeButton.className = "btn btn-danger-soft";
+                closeButton.textContent = "Review form";
+            } else {
+                icon.className = "feedback-icon is-success";
+                icon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+                kicker.textContent = "Success";
+                title.textContent = "Student record saved";
+                closeButton.className = "btn btn-success-soft";
+                closeButton.textContent = "Continue";
+            }
+
+            copy.textContent = activeMessage.textContent.trim();
+            modal.show();
         })();
     </script>
 </body>

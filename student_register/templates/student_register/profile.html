@@ -3,40 +3,81 @@
 {% block title %}Profile{% endblock title %}
 
 {% block content %}
-<div class="card border-0">
-    <div class="card-header">
-        <h1 class="mb-0 fs-3">My Profile</h1>
+<div class="profile-page">
+    <div class="section-card profile-summary-card mb-2">
+        <div class="section-card-header">
+            <h1 class="h3 mb-1">My Profile</h1>
+            <p class="text-muted-app mb-0">Student information is grouped below so related details are easier to review and update.</p>
+        </div>
+        <div class="section-card-body profile-card-body">
+            <div class="profile-summary-strip">
+                <div class="profile-summary-item">
+                    <span>Student Number</span>
+                    <strong>{{ request.user.student_no|default:"Not assigned" }}</strong>
+                </div>
+                <div class="profile-summary-item">
+                    <span>Degree</span>
+                    <strong>{{ request.user.degree|default:"Not assigned" }}</strong>
+                </div>
+                <div class="profile-summary-item">
+                    <span>Enrollment Status</span>
+                    <strong>{{ request.user.get_enrollment_status_display }}</strong>
+                </div>
+                <div class="profile-summary-item">
+                    <span>Academic Year</span>
+                    <strong>{{ request.user.academic_year|default:"Not set" }}</strong>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="card-body">
-        <form method="post" class="row g-3">
-            {% csrf_token %}
-            {% for field in form %}
-            <div class="col-md-6">
-                <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-                {{ field }}
-                {% for error in field.errors %}
-                <div class="text-warning small mt-2">{{ error }}</div>
+
+    <div class="section-card profile-form-card">
+        <div class="section-card-header">
+            <h2 class="h4 mb-1">Information Card</h2>
+            <p class="text-muted-app mb-0">Each section has its own divider and grouped fields for cleaner editing.</p>
+        </div>
+        <div class="section-card-body profile-card-body">
+            <form method="post" class="profile-form-layout">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                <div class="alert alert-warning">
+                    {% for error in form.non_field_errors %}
+                        <div>{{ error }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% for section in profile_sections %}
+                <section class="profile-group">
+                    <div class="profile-group-header">
+                        <div>
+                            <h3 class="profile-group-title">{{ section.title }}</h3>
+                            <p class="text-muted-app mb-0">{{ section.description }}</p>
+                        </div>
+                    </div>
+                    <div class="row g-3 profile-group-fields">
+                        {% for item in section.fields %}
+                        <div class="col-12 {{ item.column_class }}">
+                            {% with field=item.bound_field %}
+                            <div class="profile-input-wrap">
+                                <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                {{ field }}
+                                {% for error in field.errors %}
+                                <div class="text-warning small mt-2">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            {% endwith %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </section>
                 {% endfor %}
-            </div>
-            {% endfor %}
-            <div class="col-12">
-                <button type="submit" class="btn btn-primary">Save Profile</button>
-            </div>
-        </form>
-        <hr class="my-4">
-        <div class="row g-3">
-            <div class="col-md-4">
-                <div class="small text-muted-app">Student Number</div>
-                <div class="fw-bold">{{ request.user.student_no|default:"Not assigned" }}</div>
-            </div>
-            <div class="col-md-4">
-                <div class="small text-muted-app">Degree</div>
-                <div class="fw-bold">{{ request.user.degree|default:"Not assigned" }}</div>
-            </div>
-            <div class="col-md-4">
-                <div class="small text-muted-app">Enrollment Status</div>
-                <div class="fw-bold">{{ request.user.get_enrollment_status_display }}</div>
-            </div>
+
+                <div class="profile-actions">
+                    <button type="submit" class="btn btn-primary">Save Profile</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
