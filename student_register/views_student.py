@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
-from .forms_profile import ProfileForm
+from .forms_profile import PROFILE_FIELD_SECTIONS, ProfileForm
 from .models import User
 
 
@@ -33,4 +33,24 @@ def profile(request):
         messages.success(request, "Your profile has been updated.")
         return redirect("profile")
 
-    return render(request, "student_register/profile.html", {"form": form})
+    profile_sections = [
+        {
+            "kicker": section["kicker"],
+            "title": section["title"],
+            "description": section["description"],
+            "fields": [
+                {
+                    "bound_field": form[field_name],
+                    "column_class": column_class,
+                }
+                for field_name, column_class in section["fields"]
+            ],
+        }
+        for section in PROFILE_FIELD_SECTIONS
+    ]
+
+    context = {
+        "form": form,
+        "profile_sections": profile_sections,
+    }
+    return render(request, "student_register/profile.html", context)

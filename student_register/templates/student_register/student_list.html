@@ -3,91 +3,160 @@
 {% block title %}Student Accounts{% endblock title %}
 
 {% block content %}
-<div class="card border-0">
-    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-3">
-        <div>
-            <h1 class="mb-1 fs-3">Student Accounts</h1>
-            <p class="mb-0 text-white-50">Create, search, update, and remove student logins.</p>
+<div class="student-list-shell">
+    <div class="section-card student-list-header-card">
+        <div class="section-card-header student-list-header">
+            <div>
+                <div class="student-list-kicker">Admin Management</div>
+                <h1 class="mb-1 fs-3">Student Accounts</h1>
+                <p class="mb-0 text-muted-app">Create, search, update, and remove student logins from one organized workspace.</p>
+            </div>
+            <a href="{% url 'student_create' %}" class="btn btn-accent">
+                <i class="fa-solid fa-user-plus me-2"></i>New Student
+            </a>
         </div>
-        <a href="{% url 'student_create' %}" class="btn btn-accent">
-            <i class="fa-solid fa-user-plus me-2"></i>New Student
-        </a>
     </div>
-    <div class="card-body">
-        <form method="get" class="row g-3 mb-4">
-            <div class="col-md-10">
-                <input
-                    type="text"
-                    name="q"
-                    class="form-control"
-                    value="{{ query }}"
-                    placeholder="Search by name, username, email, degree, or student number"
-                >
-            </div>
-            <div class="col-md-2 d-grid">
-                <button type="submit" class="btn btn-primary">Search</button>
-            </div>
-        </form>
 
-        <div class="table-responsive">
-            <table class="table table-dark align-middle">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Username</th>
-                        <th>Student No</th>
-                        <th>Email</th>
-                        <th>Degree</th>
-                        <th>Year</th>
-                        <th>Section</th>
-                        <th>Status</th>
-                        <th class="text-end">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for student in students %}
-                    <tr>
-                        <td>{{ student.full_name }}</td>
-                        <td>{{ student.username }}</td>
-                        <td>{{ student.student_no }}</td>
-                        <td>{{ student.email }}</td>
-                        <td>{{ student.degree|default:"Not assigned" }}</td>
-                        <td>{{ student.year_level|default:"Not set" }}</td>
-                        <td>{{ student.section|default:"-" }}</td>
-                        <td>
-                            {% if student.is_active %}
-                            <span class="badge text-bg-success">Active</span>
+    <div class="section-card student-list-filter-card">
+        <div class="section-card-header">
+            <h2 class="h5 mb-1">Search Students</h2>
+            <p class="text-muted-app mb-0">Find records by name, username, email, degree, or student number.</p>
+        </div>
+        <div class="section-card-body">
+            <form method="get" class="student-list-search">
+                <div class="student-search-input">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input
+                        type="text"
+                        name="q"
+                        class="form-control"
+                        value="{{ query }}"
+                        placeholder="Search by name, username, email, degree, or student number"
+                    >
+                </div>
+                <div class="student-search-actions">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                    {% if query %}
+                    <a href="{% url 'student_list' %}" class="btn btn-outline-light">Reset</a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="section-card student-table-card">
+        <div class="section-card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <h2 class="h4 mb-1">Student Directory</h2>
+                <p class="text-muted-app mb-0">Review account details, academic assignment, and record status at a glance.</p>
+            </div>
+            <div class="student-table-count">{{ page_obj.paginator.count }} record{{ page_obj.paginator.count|pluralize }}</div>
+        </div>
+        <div class="section-card-body">
+            <div class="table-responsive student-table-wrap">
+                <table class="table align-middle student-list-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Username</th>
+                            <th>Student No</th>
+                            <th>Email</th>
+                            <th>Degree</th>
+                            <th>Year</th>
+                            <th>Section</th>
+                            <th>Status</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students %}
+                        <tr>
+                            <td>
+                                <div class="student-primary-cell">
+                                    <div class="student-primary-name">{{ student.full_name }}</div>
+                                    <div class="student-primary-meta">{{ student.email }}</div>
+                                </div>
+                            </td>
+                            <td><span class="student-inline-chip">{{ student.username }}</span></td>
+                            <td>{{ student.student_no|default:"-" }}</td>
+                            <td class="text-break">{{ student.email }}</td>
+                            <td>{{ student.degree|default:"Not assigned" }}</td>
+                            <td>{{ student.year_level|default:"Not set" }}</td>
+                            <td>{{ student.section|default:"-" }}</td>
+                            <td>
+                                {% if student.is_active %}
+                                <span class="student-status-badge is-active">Active</span>
+                                {% else %}
+                                <span class="student-status-badge is-inactive">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end student-actions-cell">
+                                <div class="student-row-actions">
+                                    <a href="{% url 'student_detail' student.pk %}" class="btn btn-sm btn-outline-light student-action-btn">View</a>
+                                    <a href="{% url 'student_edit' student.pk %}" class="btn btn-sm btn-primary student-action-btn">Edit</a>
+                                    <form
+                                        method="post"
+                                        action="{% url 'student_delete' student.pk %}"
+                                        class="student-delete-form js-confirm-form"
+                                        data-confirm-variant="danger"
+                                        data-confirm-kicker="Delete Student"
+                                        data-confirm-title="Delete {{ student.full_name|escape }}?"
+                                        data-confirm-message="This will permanently remove the student account and its record details. This action cannot be undone."
+                                        data-confirm-button="Delete student"
+                                    >
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-accent student-action-btn">Delete</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="9" class="text-center student-empty-state">No student accounts found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if page_obj.has_other_pages %}
+            <div class="student-pagination">
+                <div class="student-pagination-summary">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                </div>
+                <nav aria-label="Student list pagination">
+                    <div class="student-pagination-links">
+                        {% if page_obj.has_previous %}
+                        <a href="?{% if query %}q={{ query|urlencode }}&amp;{% endif %}page={{ page_obj.previous_page_number }}" class="student-page-link">
+                            Previous
+                        </a>
+                        {% else %}
+                        <span class="student-page-link is-disabled">Previous</span>
+                        {% endif %}
+
+                        {% for page_number in page_numbers %}
+                            {% if page_number == pagination_ellipsis %}
+                            <span class="student-page-link is-ellipsis">{{ pagination_ellipsis }}</span>
+                            {% elif page_number == page_obj.number %}
+                            <span class="student-page-link is-active">{{ page_number }}</span>
                             {% else %}
-                            <span class="badge text-bg-secondary">Inactive</span>
+                            <a href="?{% if query %}q={{ query|urlencode }}&amp;{% endif %}page={{ page_number }}" class="student-page-link">
+                                {{ page_number }}
+                            </a>
                             {% endif %}
-                        </td>
-                        <td class="text-end">
-                            <div class="d-inline-flex gap-2 flex-wrap justify-content-end">
-                                <a href="{% url 'student_detail' student.pk %}" class="btn btn-sm btn-outline-light">View</a>
-                                <a href="{% url 'student_edit' student.pk %}" class="btn btn-sm btn-primary">Edit</a>
-                                <form
-                                    method="post"
-                                    action="{% url 'student_delete' student.pk %}"
-                                    class="d-inline js-confirm-form"
-                                    data-confirm-variant="danger"
-                                    data-confirm-kicker="Delete Student"
-                                    data-confirm-title="Delete {{ student.full_name|escape }}?"
-                                    data-confirm-message="This will permanently remove the student account and its record details. This action cannot be undone."
-                                    data-confirm-button="Delete student"
-                                >
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm btn-accent">Delete</button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="9" class="text-center">No student accounts found.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <a href="?{% if query %}q={{ query|urlencode }}&amp;{% endif %}page={{ page_obj.next_page_number }}" class="student-page-link">
+                            Next
+                        </a>
+                        {% else %}
+                        <span class="student-page-link is-disabled">Next</span>
+                        {% endif %}
+                    </div>
+                </nav>
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>

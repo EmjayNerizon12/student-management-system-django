@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 
@@ -41,8 +42,15 @@ def student_list(request):
             | Q(enrollment_status__icontains=query)
         )
 
+    students = students.order_by("first_name", "last_name")
+    paginator = Paginator(students, 10)
+    page_obj = paginator.get_page(request.GET.get("page"))
+
     context = {
-        "students": students.order_by("first_name", "last_name"),
+        "students": page_obj,
+        "page_obj": page_obj,
+        "pagination_ellipsis": paginator.ELLIPSIS,
+        "page_numbers": paginator.get_elided_page_range(number=page_obj.number, on_each_side=1, on_ends=1),
         "query": query,
     }
     return render(request, "student_register/student_list.html", context)
@@ -63,6 +71,8 @@ def student_create(request):
         form.save()
         messages.success(request, "Student account created successfully.")
         return redirect("student_list")
+    if request.method == "POST":
+        messages.error(request, "We couldn't save the student record. Review the highlighted fields and try again.")
     return render(
         request,
         "student_register/student_form.html",
@@ -79,6 +89,8 @@ def student_edit(request, pk):
         form.save()
         messages.success(request, "Student account updated successfully.")
         return redirect("student_list")
+    if request.method == "POST":
+        messages.error(request, "We couldn't save the student record. Review the highlighted fields and try again.")
     return render(
         request,
         "student_register/student_form.html",
