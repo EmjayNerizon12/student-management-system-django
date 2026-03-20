@@ -111,15 +111,47 @@ def student_delete(request, pk):
 @login_required
 @admin_required
 def degree_list(request):
-    form = DegreeForm(request.POST or None)
-    if request.method == "POST" and form.is_valid():
-        form.save()
-        messages.success(request, "Degree added successfully.")
-        return redirect("degree_list")
+    open_degree_modal = None
+    add_form = DegreeForm(prefix="add")
+    active_edit_form = None
+
+    if request.method == "POST":
+        degree_action = request.POST.get("degree_action", "add")
+
+        if degree_action == "edit":
+            degree = get_object_or_404(Degree, pk=request.POST.get("degree_id"))
+            active_edit_form = DegreeForm(request.POST, instance=degree, prefix=f"edit-{degree.pk}")
+            if active_edit_form.is_valid():
+                active_edit_form.save()
+                messages.success(request, "Degree updated successfully.")
+                return redirect("degree_list")
+            open_degree_modal = f"degreeEditModal{degree.pk}"
+        else:
+            add_form = DegreeForm(request.POST, prefix="add")
+            if add_form.is_valid():
+                add_form.save()
+                messages.success(request, "Degree added successfully.")
+                return redirect("degree_list")
+            open_degree_modal = "degreeAddModal"
+
+    degrees = list(Degree.objects.prefetch_related("students").all())
+    degree_rows = []
+    for degree in degrees:
+        degree_rows.append(
+            {
+                "degree": degree,
+                "form": active_edit_form
+                if active_edit_form is not None and active_edit_form.instance.pk == degree.pk
+                else DegreeForm(instance=degree, prefix=f"edit-{degree.pk}"),
+                "modal_id": f"degreeEditModal{degree.pk}",
+            }
+        )
 
     context = {
-        "form": form,
-        "degrees": Degree.objects.prefetch_related("students").all(),
+        "add_form": add_form,
+        "degree_rows": degree_rows,
+        "degree_count": len(degree_rows),
+        "open_degree_modal": open_degree_modal,
     }
     return render(request, "student_register/degree_list.html", context)
 

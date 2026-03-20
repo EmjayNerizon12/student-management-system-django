@@ -127,6 +127,36 @@ class AccountFlowTests(TestCase):
         call_command("seed_degrees")
         self.assertGreater(Degree.objects.count(), 0)
 
+    def test_admin_can_add_degree_from_degree_list_modal(self):
+        self.client.login(username="admin01", password="admin-pass-123")
+        response = self.client.post(
+            reverse("degree_list"),
+            {
+                "degree_action": "add",
+                "add-degree_title": "Information Technology",
+            },
+            follow=True,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(Degree.objects.filter(degree_title="Information Technology").exists())
+        self.assertContains(response, "Degree added successfully.")
+
+    def test_admin_can_edit_degree_from_degree_list_modal(self):
+        self.client.login(username="admin01", password="admin-pass-123")
+        response = self.client.post(
+            reverse("degree_list"),
+            {
+                "degree_action": "edit",
+                "degree_id": self.degree.pk,
+                f"edit-{self.degree.pk}-degree_title": "Computer Engineering",
+            },
+            follow=True,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.degree.refresh_from_db()
+        self.assertEqual(self.degree.degree_title, "Computer Engineering")
+        self.assertContains(response, "Degree updated successfully.")
+
     def test_student_seeder_creates_requested_records(self):
         User.objects.filter(role=User.Role.STUDENT).delete()
         call_command("seed_students", count=5, password="SeedPass123!")
