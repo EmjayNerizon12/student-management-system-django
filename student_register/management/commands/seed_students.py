@@ -47,7 +47,7 @@ class Command(BaseCommand):
         )
         parser.add_argument(
             "--password",
-            default="Student123!",
+            default="password",
             help="Default password for all seeded student accounts.",
         )
         parser.add_argument(
