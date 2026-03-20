@@ -44,10 +44,12 @@ A Django student management application with role-based accounts for admins and 
 - `/` - app entry point
 - `/login/` - login page
 - `/logout/` - logout
+- `/dashboard/` - role-aware dashboard redirect
 - `/admin/dashboard/` - admin dashboard
 - `/student/dashboard/` - student dashboard
 - `/students/` - student account list
 - `/students/new/` - create student account
+- `/students/<id>/` - student detail page
 - `/degrees/` - degree management
 - `/profile/` - logged-in user profile
 - `/admin/` - Django admin
@@ -81,13 +83,26 @@ python manage.py makemigrations
 python manage.py migrate
 ```
 
-5. Create an admin account:
+5. Seed the default admin account:
 
 ```bash
-python manage.py createsuperuser
+python manage.py seed_admin
 ```
 
-6. Start the development server:
+Default admin login:
+
+- Username: `admin.example`
+- Password: `password`
+- Email: `admin@example.com`
+- Role: `Admin Access`
+
+6. Optionally seed demo students:
+
+```bash
+python manage.py seed_students
+```
+
+7. Start the development server:
 
 ```bash
 python manage.py runserver
@@ -113,7 +128,13 @@ Apply migrations:
 python manage.py migrate
 ```
 
-Create admin user:
+Seed default admin user:
+
+```bash
+python manage.py seed_admin
+```
+
+Create Django superuser manually:
 
 ```bash
 python manage.py createsuperuser
@@ -148,6 +169,8 @@ Seed 100 student accounts:
 ```bash
 python manage.py seed_students
 ```
+
+`seed_students` also makes sure the default admin account exists.
 
 Seed a custom number of student accounts:
 
@@ -197,7 +220,16 @@ python manage.py migrate
 ## Default Local URLs
 
 - App: `http://127.0.0.1:8000/`
+- Login: `http://127.0.0.1:8000/login/`
+- Admin dashboard: `http://127.0.0.1:8000/admin/dashboard/`
 - Django admin: `http://127.0.0.1:8000/admin/`
+
+## Default Seeded Admin Account
+
+- Username: `admin.example`
+- Password: `password`
+- Email: `admin@example.com`
+- Access: `Admin Access`
 
 ## Requirements
 

@@ -2,6 +2,7 @@ from datetime import date, timedelta
 
 from django.core.management.base import BaseCommand
 
+from student_register.management.commands.seed_admin import ensure_admin_account
 from student_register.management.commands.seed_degrees import DEFAULT_DEGREES
 from student_register.models import Degree, User
 
@@ -59,6 +60,14 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         count = max(options["count"], 0)
         password = options["password"]
+
+        admin_user, admin_created = ensure_admin_account()
+        admin_action = "Created" if admin_created else "Updated"
+        self.stdout.write(
+            self.style.SUCCESS(
+                f"{admin_action} admin account: username={admin_user.username}, email={admin_user.email}"
+            )
+        )
 
         for degree_title in DEFAULT_DEGREES:
             Degree.objects.get_or_create(degree_title=degree_title)

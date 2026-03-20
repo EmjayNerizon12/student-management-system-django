@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.core.management import call_command
 
 from .models import Degree, User
+from .management.commands.seed_admin import DEFAULT_ADMIN_EMAIL, DEFAULT_ADMIN_USERNAME
 
 
 class AccountFlowTests(TestCase):
@@ -61,3 +62,16 @@ class AccountFlowTests(TestCase):
         User.objects.filter(role=User.Role.STUDENT).delete()
         call_command("seed_students", count=5, password="SeedPass123!")
         self.assertEqual(User.objects.filter(role=User.Role.STUDENT).count(), 5)
+
+    def test_admin_seeder_creates_default_admin_account(self):
+        User.objects.filter(username=DEFAULT_ADMIN_USERNAME).delete()
+        call_command("seed_admin")
+        admin_user = User.objects.get(username=DEFAULT_ADMIN_USERNAME)
+        self.assertEqual(admin_user.email, DEFAULT_ADMIN_EMAIL)
+        self.assertEqual(admin_user.role, User.Role.ADMIN)
+        self.assertTrue(admin_user.is_staff)
+
+    def test_student_seeder_also_ensures_default_admin_account(self):
+        User.objects.filter(username=DEFAULT_ADMIN_USERNAME).delete()
+        call_command("seed_students", count=1, password="SeedPass123!")
+        self.assertTrue(User.objects.filter(username=DEFAULT_ADMIN_USERNAME, role=User.Role.ADMIN).exists())
