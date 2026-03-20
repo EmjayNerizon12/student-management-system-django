@@ -65,7 +65,16 @@
                             <div class="d-inline-flex gap-2 flex-wrap justify-content-end">
                                 <a href="{% url 'student_detail' student.pk %}" class="btn btn-sm btn-outline-light">View</a>
                                 <a href="{% url 'student_edit' student.pk %}" class="btn btn-sm btn-primary">Edit</a>
-                                <form method="post" action="{% url 'student_delete' student.pk %}" class="d-inline">
+                                <form
+                                    method="post"
+                                    action="{% url 'student_delete' student.pk %}"
+                                    class="d-inline js-confirm-form"
+                                    data-confirm-variant="danger"
+                                    data-confirm-kicker="Delete Student"
+                                    data-confirm-title="Delete {{ student.full_name|escape }}?"
+                                    data-confirm-message="This will permanently remove the student account and its record details. This action cannot be undone."
+                                    data-confirm-button="Delete student"
+                                >
                                     {% csrf_token %}
                                     <button type="submit" class="btn btn-sm btn-accent">Delete</button>
                                 </form>
