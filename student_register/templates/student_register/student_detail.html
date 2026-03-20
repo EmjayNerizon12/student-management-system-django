@@ -1,73 +1,306 @@
 {% extends "student_register/base.html" %}
+{% load static %}
 
 {% block title %}Student Record{% endblock title %}
 
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/student-detail.css' %}">
+{% endblock extra_head %}
+
 {% block content %}
-<div class="card border-0">
-    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-3">
-        <div>
-            <h1 class="mb-1 fs-3">{{ student.full_name }}</h1>
-            <p class="mb-0 text-white-50">Complete student record and account profile.</p>
+<div class="student-detail-shell">
+    <section class="student-hero">
+        <div class="student-hero-grid">
+            <div>
+                <div class="student-kicker">
+                    <i class="fa-solid fa-id-card"></i>
+                    Student Record
+                </div>
+
+                <div class="student-identity">
+                    <div class="student-avatar">
+                        {% if student.first_name or student.last_name %}
+                            {{ student.first_name|first|upper }}{{ student.last_name|first|upper }}
+                        {% else %}
+                            {{ student.username|first|upper }}
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <h1 class="student-title">{{ student.full_name }}</h1>
+                        <p class="student-subtitle">
+                            Review identity, academic standing, support contacts, and account details in one polished view.
+                        </p>
+
+                        <div class="student-meta-list">
+                            <div class="student-meta-chip">
+                                <i class="fa-solid fa-user"></i>
+                                <div>
+                                    <span>Username</span>
+                                    <strong>{{ student.username }}</strong>
+                                </div>
+                            </div>
+                            <div class="student-meta-chip">
+                                <i class="fa-solid fa-envelope"></i>
+                                <div>
+                                    <span>Email</span>
+                                    <strong class="text-break">{{ student.email }}</strong>
+                                </div>
+                            </div>
+                            <div class="student-meta-chip">
+                                <i class="fa-solid fa-graduation-cap"></i>
+                                <div>
+                                    <span>Degree</span>
+                                    <strong>{{ student.degree|default:"Not assigned" }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="student-hero-side">
+                <div class="status-panel">
+                    <div class="status-label">Enrollment Status</div>
+                    <div>
+                        <span class="status-pill {% if student.enrollment_status == 'enrolled' %}is-enrolled{% elif student.enrollment_status == 'regular' %}is-regular{% elif student.enrollment_status == 'on_leave' %}is-on-leave{% elif student.enrollment_status == 'graduated' %}is-graduated{% else %}is-withdrawn{% endif %}">
+                            <i class="fa-solid fa-circle-check"></i>
+                            {{ student.get_enrollment_status_display }}
+                        </span>
+                    </div>
+
+                    <div class="hero-stats">
+                        <div class="hero-stat">
+                            <span>Student Number</span>
+                            <strong>{{ student.student_no|default:"Not set" }}</strong>
+                        </div>
+                        <div class="hero-stat">
+                            <span>Academic Year</span>
+                            <strong>{{ student.academic_year|default:"Not set" }}</strong>
+                        </div>
+                        <div class="hero-stat">
+                            <span>Year Level</span>
+                            <strong>{{ student.year_level|default:"Not set" }}</strong>
+                        </div>
+                        <div class="hero-stat">
+                            <span>Section</span>
+                            <strong>{{ student.section|default:"Not set" }}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="actions-panel">
+                    <div class="status-label">Actions</div>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'student_edit' student.pk %}" class="btn btn-accent">
+                            <i class="fa-solid fa-pen-to-square me-2"></i>Edit Record
+                        </a>
+                        <a href="{% url 'student_list' %}" class="btn btn-outline-light">
+                            <i class="fa-solid fa-arrow-left me-2"></i>Back to Students
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="d-flex gap-2 flex-wrap">
-            <a href="{% url 'student_edit' student.pk %}" class="btn btn-primary">Edit</a>
-            <a href="{% url 'student_list' %}" class="btn btn-accent">Back to List</a>
+    </section>
+
+    <section class="detail-grid">
+        <article class="detail-card">
+            <div class="detail-card-header">
+                <div>
+                    <h2 class="detail-card-title">Identity & Account</h2>
+                    <p class="detail-card-copy">Basic student identity and account metadata.</p>
+                </div>
+                <div class="detail-icon soft-primary">
+                    <i class="fa-solid fa-user-graduate"></i>
+                </div>
+            </div>
+            <div class="detail-list">
+                <div class="detail-item">
+                    <div>
+                        <div class="detail-item-label">Date of Birth</div>
+                    </div>
+                    <div class="detail-item-value {% if not student.date_of_birth %}is-empty{% endif %}">{{ student.date_of_birth|default:"Not set" }}</div>
+                </div>
+                <div class="detail-item">
+                    <div>
+                        <div class="detail-item-label">Birth Place</div>
+                    </div>
+                    <div class="detail-item-value {% if not student.birth_place %}is-empty{% endif %}">{{ student.birth_place|default:"Not set" }}</div>
+                </div>
+                <div class="detail-item">
+                    <div>
+                        <div class="detail-item-label">Gender</div>
+                    </div>
+                    <div class="detail-item-value {% if not student.gender %}is-empty{% endif %}">{{ student.get_gender_display|default:"Not set" }}</div>
+                </div>
+                <div class="detail-item">
+                    <div>
+                        <div class="detail-item-label">Nationality</div>
+                    </div>
+                    <div class="detail-item-value {% if not student.nationality %}is-empty{% endif %}">{{ student.nationality|default:"Not set" }}</div>
+                </div>
+            </div>
+        </article>
+
+        <article class="detail-card">
+            <div class="detail-card-header">
+                <div>
+                    <h2 class="detail-card-title">Contact & Address</h2>
+                    <p class="detail-card-copy">Reachability and location details for the student.</p>
+                </div>
+                <div class="detail-icon soft-accent">
+                    <i class="fa-solid fa-location-dot"></i>
+                </div>
+            </div>
+            <div class="detail-list">
+                <div class="detail-item">
+                    <div>
+                        <div class="detail-item-label">Phone Number</div>
+                    </div>
+                    <div class="detail-item-value {% if not student.phone_number %}is-empty{% endif %}">{{ student.phone_number|default:"Not set" }}</div>
+                </div>
+                <div class="detail-item">
+                    <div>
+                        <div class="detail-item-label">Street Address</div>
+                    </div>
+                    <div class="detail-item-value {% if not student.address_line %}is-empty{% endif %}">{{ student.address_line|default:"Not set" }}</div>
+                </div>
+                <div class="detail-item">
+                    <div>
+                        <div class="detail-item-label">City / Province</div>
+                    </div>
+                    <div class="detail-item-value {% if not student.city and not student.state_province %}is-empty{% endif %}">
+                        {% if student.city or student.state_province %}
+                            {{ student.city|default:"" }}{% if student.city and student.state_province %}, {% endif %}{{ student.state_province|default:"" }}
+                        {% else %}
+                            Not set
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <div>
+                        <div class="detail-item-label">Postal / Country</div>
+                    </div>
+                    <div class="detail-item-value {% if not student.postal_code and not student.country %}is-empty{% endif %}">
+                        {% if student.postal_code or student.country %}
+                            {{ student.postal_code|default:"" }}{% if student.postal_code and student.country %}, {% endif %}{{ student.country|default:"" }}
+                        {% else %}
+                            Not set
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <article class="detail-card">
+            <div class="detail-card-header">
+                <div>
+                    <h2 class="detail-card-title">Academic Profile</h2>
+                    <p class="detail-card-copy">Degree assignment, level, and timeline details.</p>
+                </div>
+                <div class="detail-icon soft-neutral">
+                    <i class="fa-solid fa-book-open-reader"></i>
+                </div>
+            </div>
+            <div class="detail-list">
+                <div class="detail-item">
+                    <div>
+                        <div class="detail-item-label">Degree Program</div>
+                    </div>
+                    <div class="detail-item-value {% if not student.degree %}is-empty{% endif %}">{{ student.degree|default:"Not assigned" }}</div>
+                </div>
+                <div class="detail-item">
+                    <div>
+                        <div class="detail-item-label">Admission Date</div>
+                    </div>
+                    <div class="detail-item-value {% if not student.admission_date %}is-empty{% endif %}">{{ student.admission_date|default:"Not set" }}</div>
+                </div>
+                <div class="detail-item">
+                    <div>
+                        <div class="detail-item-label">Academic Year</div>
+                    </div>
+                    <div class="detail-item-value {% if not student.academic_year %}is-empty{% endif %}">{{ student.academic_year|default:"Not set" }}</div>
+                </div>
+                <div class="detail-item">
+                    <div>
+                        <div class="detail-item-label">Year / Section</div>
+                    </div>
+                    <div class="detail-item-value {% if not student.year_level and not student.section %}is-empty{% endif %}">
+                        {% if student.year_level or student.section %}
+                            {{ student.year_level|default:"" }}{% if student.year_level and student.section %} / {% endif %}{{ student.section|default:"" }}
+                        {% else %}
+                            Not set
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <article class="detail-card">
+            <div class="detail-card-header">
+                <div>
+                    <h2 class="detail-card-title">Guardian & Emergency</h2>
+                    <p class="detail-card-copy">Important support contacts connected to this record.</p>
+                </div>
+                <div class="detail-icon soft-primary">
+                    <i class="fa-solid fa-shield-heart"></i>
+                </div>
+            </div>
+            <div class="detail-list">
+                <div class="detail-item">
+                    <div>
+                        <div class="detail-item-label">Guardian</div>
+                    </div>
+                    <div class="detail-item-value {% if not student.guardian_name %}is-empty{% endif %}">
+                        {{ student.guardian_name|default:"Not set" }}
+                        {% if student.guardian_relationship %}<div class="detail-item-label">{{ student.guardian_relationship }}</div>{% endif %}
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <div>
+                        <div class="detail-item-label">Guardian Phone</div>
+                    </div>
+                    <div class="detail-item-value {% if not student.guardian_phone %}is-empty{% endif %}">{{ student.guardian_phone|default:"Not set" }}</div>
+                </div>
+                <div class="detail-item">
+                    <div>
+                        <div class="detail-item-label">Emergency Contact</div>
+                    </div>
+                    <div class="detail-item-value {% if not student.emergency_contact_name %}is-empty{% endif %}">
+                        {{ student.emergency_contact_name|default:"Not set" }}
+                        {% if student.emergency_contact_relationship %}<div class="detail-item-label">{{ student.emergency_contact_relationship }}</div>{% endif %}
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <div>
+                        <div class="detail-item-label">Emergency Phone</div>
+                    </div>
+                    <div class="detail-item-value {% if not student.emergency_contact_phone %}is-empty{% endif %}">{{ student.emergency_contact_phone|default:"Not set" }}</div>
+                </div>
+            </div>
+        </article>
+    </section>
+
+    <section class="notes-card">
+        <div class="detail-card-header">
+            <div>
+                <h2 class="detail-card-title">Notes</h2>
+                <p class="detail-card-copy">Additional remarks saved for this student record.</p>
+            </div>
+            <div class="detail-icon soft-accent">
+                <i class="fa-solid fa-note-sticky"></i>
+            </div>
         </div>
-    </div>
-    <div class="card-body">
-        <div class="row g-4">
-            <div class="col-lg-6">
-                <div class="p-4 rounded-4 h-100" style="background: rgba(13, 110, 253, 0.10);">
-                    <h2 class="h5 mb-3">Account and Identity</h2>
-                    <div class="mb-2"><strong>Username:</strong> {{ student.username }}</div>
-                    <div class="mb-2"><strong>Email:</strong> {{ student.email }}</div>
-                    <div class="mb-2"><strong>Student Number:</strong> {{ student.student_no|default:"Not set" }}</div>
-                    <div class="mb-2"><strong>Date of Birth:</strong> {{ student.date_of_birth|default:"Not set" }}</div>
-                    <div class="mb-2"><strong>Birth Place:</strong> {{ student.birth_place|default:"Not set" }}</div>
-                    <div class="mb-2"><strong>Gender:</strong> {{ student.get_gender_display|default:"Not set" }}</div>
-                    <div><strong>Nationality:</strong> {{ student.nationality|default:"Not set" }}</div>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="p-4 rounded-4 h-100" style="background: rgba(255, 193, 7, 0.10);">
-                    <h2 class="h5 mb-3">Contact and Address</h2>
-                    <div class="mb-2"><strong>Phone:</strong> {{ student.phone_number|default:"Not set" }}</div>
-                    <div class="mb-2"><strong>Address:</strong> {{ student.address_line|default:"Not set" }}</div>
-                    <div class="mb-2"><strong>City:</strong> {{ student.city|default:"Not set" }}</div>
-                    <div class="mb-2"><strong>Province/State:</strong> {{ student.state_province|default:"Not set" }}</div>
-                    <div class="mb-2"><strong>Postal Code:</strong> {{ student.postal_code|default:"Not set" }}</div>
-                    <div><strong>Country:</strong> {{ student.country|default:"Not set" }}</div>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="p-4 rounded-4 h-100" style="background: rgba(255, 255, 255, 0.08);">
-                    <h2 class="h5 mb-3">Academic Information</h2>
-                    <div class="mb-2"><strong>Degree:</strong> {{ student.degree|default:"Not assigned" }}</div>
-                    <div class="mb-2"><strong>Admission Date:</strong> {{ student.admission_date|default:"Not set" }}</div>
-                    <div class="mb-2"><strong>Academic Year:</strong> {{ student.academic_year|default:"Not set" }}</div>
-                    <div class="mb-2"><strong>Year Level:</strong> {{ student.year_level|default:"Not set" }}</div>
-                    <div class="mb-2"><strong>Section:</strong> {{ student.section|default:"Not set" }}</div>
-                    <div><strong>Enrollment Status:</strong> {{ student.get_enrollment_status_display }}</div>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="p-4 rounded-4 h-100" style="background: rgba(13, 110, 253, 0.10);">
-                    <h2 class="h5 mb-3">Guardian and Emergency</h2>
-                    <div class="mb-2"><strong>Guardian:</strong> {{ student.guardian_name|default:"Not set" }}</div>
-                    <div class="mb-2"><strong>Guardian Relationship:</strong> {{ student.guardian_relationship|default:"Not set" }}</div>
-                    <div class="mb-2"><strong>Guardian Phone:</strong> {{ student.guardian_phone|default:"Not set" }}</div>
-                    <div class="mb-2"><strong>Emergency Contact:</strong> {{ student.emergency_contact_name|default:"Not set" }}</div>
-                    <div class="mb-2"><strong>Emergency Relationship:</strong> {{ student.emergency_contact_relationship|default:"Not set" }}</div>
-                    <div><strong>Emergency Phone:</strong> {{ student.emergency_contact_phone|default:"Not set" }}</div>
-                </div>
-            </div>
-            <div class="col-12">
-                <div class="p-4 rounded-4" style="background: rgba(255, 255, 255, 0.08);">
-                    <h2 class="h5 mb-3">Notes</h2>
-                    <div>{{ student.notes|default:"No notes recorded yet."|linebreaks }}</div>
-                </div>
+        <div class="notes-body">
+            <div class="notes-content">
+                {% if student.notes %}
+                    {{ student.notes|linebreaks }}
+                {% else %}
+                    <p class="notes-empty">No notes recorded yet.</p>
+                {% endif %}
             </div>
         </div>
-    </div>
+    </section>
 </div>
 {% endblock content %}
