@@ -48,7 +48,16 @@
                                 <td>{{ degree.students.count }}</td>
                                 <td class="text-end">
                                     <a href="{% url 'degree_edit' degree.pk %}" class="btn btn-sm btn-primary">Edit</a>
-                                    <form method="post" action="{% url 'degree_delete' degree.pk %}" class="d-inline">
+                                    <form
+                                        method="post"
+                                        action="{% url 'degree_delete' degree.pk %}"
+                                        class="d-inline js-confirm-form"
+                                        data-confirm-variant="danger"
+                                        data-confirm-kicker="Delete Degree"
+                                        data-confirm-title="Delete {{ degree.degree_title|escape }}?"
+                                        data-confirm-message="This will permanently remove the degree entry from the system. Please make sure it is no longer needed before continuing."
+                                        data-confirm-button="Delete degree"
+                                    >
                                         {% csrf_token %}
                                         <button type="submit" class="btn btn-sm btn-accent">Delete</button>
                                     </form>
